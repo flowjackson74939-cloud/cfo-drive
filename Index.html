@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Операционный аудит и кризис-аналитика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#111;-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit;font-size:inherit;color:inherit}
+
+/* ── VARIABLES ── */
+:root{
+  --accent:#2563EB;
+  --accent-hover:#1D4ED8;
+  --text:#111;
+  --muted:#6B7280;
+  --border:#E5E7EB;
+  --bg-soft:#F9FAFB;
+  --bg-blue:#EFF6FF;
+  --danger:#DC2626;
+  --warn:#D97706;
+  --ok:#16A34A;
+  --radius:12px;
+  --radius-lg:20px;
+}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 40px;
+}
+.nav-inner{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;
+}
+.nav-logo{font-weight:800;font-size:17px;letter-spacing:-0.03em;color:var(--text)}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:32px;font-size:14px;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-btn{
+  background:var(--accent);color:#fff;
+  padding:10px 22px;border-radius:8px;
+  font-size:14px;font-weight:600;
+  transition:background .15s;
+}
+.nav-btn:hover{background:var(--accent-hover)}
+
+/* ── CONTAINER ── */
+.container{max-width:1200px;margin:0 auto;padding:0 40px}
+
+/* ── HERO ── */
+.hero{
+  padding:100px 40px 80px;
+  max-width:1200px;margin:0 auto;
+  text-align:center;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--bg-blue);color:var(--accent);
+  padding:7px 16px;border-radius:100px;
+  font-size:13px;font-weight:600;
+  margin-bottom:32px;
+}
+.hero-badge .dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(0.9)}}
+.hero h1{
+  font-size:clamp(38px,5.5vw,72px);
+  font-weight:900;
+  line-height:1.05;
+  letter-spacing:-0.04em;
+  color:var(--text);
+  max-width:900px;
+  margin:0 auto 24px;
+}
+.hero h1 .blue{color:var(--accent)}
+.hero-sub{
+  font-size:clamp(17px,2vw,20px);
+  color:var(--muted);
+  max-width:680px;margin:0 auto 48px;
+  line-height:1.6;
+  font-weight:400;
+}
+.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-primary{
+  background:var(--accent);color:#fff;
+  padding:16px 32px;border-radius:10px;
+  font-size:16px;font-weight:700;
+  display:inline-flex;align-items:center;gap:10px;
+  transition:background .15s, box-shadow .15s;
+  box-shadow:0 4px 24px rgba(37,99,235,0.25);
+}
+.btn-primary:hover{background:var(--accent-hover);box-shadow:0 6px 32px rgba(37,99,235,0.35)}
+.btn-secondary{
+  background:#fff;color:var(--text);
+  padding:16px 32px;border-radius:10px;
+  font-size:16px;font-weight:600;
+  border:1.5px solid var(--border);
+  transition:border-color .15s, background .15s;
+}
+.btn-secondary:hover{border-color:#9CA3AF;background:var(--bg-soft)}
+
+/* ── STATS STRIP ── */
+.stats{
+  max-width:1200px;margin:0 auto 80px;padding:0 40px;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  background:#fff;
+}
+.stat{
+  padding:32px 24px;
+  border-right:1px solid var(--border);
+  text-align:center;
+}
+.stat:last-child{border-right:none}
+.stat-val{font-size:40px;font-weight:900;color:var(--accent);letter-spacing:-0.04em;line-height:1;margin-bottom:8px}
+.stat-label{font-size:13px;color:var(--muted);font-weight:500;line-height:1.4}
+
+/* ── SECTION HEADING ── */
+.section{padding:80px 0}
+.section-label{
+  font-size:13px;font-weight:600;color:var(--accent);
+  text-transform:uppercase;letter-spacing:0.08em;
+  margin-bottom:16px;
+}
+.section-title{
+  font-size:clamp(28px,3.5vw,44px);font-weight:800;
+  letter-spacing:-0.03em;line-height:1.1;
+  color:var(--text);margin-bottom:18px;max-width:800px;
+}
+.section-desc{font-size:18px;color:var(--muted);max-width:640px;line-height:1.6}
+
+/* ── ABOUT CARDS ── */
+.about-cards{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;margin-top:48px;
+}
+.about-card{
+  background:var(--bg-soft);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:32px;
+  transition:box-shadow .2s, border-color .2s;
+}
+.about-card:hover{border-color:#93C5FD;box-shadow:0 8px 32px rgba(37,99,235,0.1)}
+.about-icon{
+  width:48px;height:48px;background:var(--bg-blue);
+  border-radius:12px;margin-bottom:20px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;
+}
+.about-tag{
+  display:inline-block;
+  background:var(--bg-blue);color:var(--accent);
+  padding:4px 10px;border-radius:100px;
+  font-size:12px;font-weight:600;
+  margin-bottom:14px;
+}
+.about-card h3{font-size:20px;font-weight:700;margin-bottom:12px;letter-spacing:-0.02em;color:var(--text)}
+.about-card p{font-size:14px;color:var(--muted);line-height:1.65}
+
+/* ── SERVICES ACCORDION ── */
+.services{margin-top:48px;border:1.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.svc-item{border-bottom:1px solid var(--border)}
+.svc-item:last-child{border-bottom:none}
+.svc-head{
+  width:100%;text-align:left;
+  padding:24px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  transition:background .15s;
+  background:#fff;
+}
+.svc-head:hover{background:var(--bg-soft)}
+.svc-item.is-open .svc-head{background:var(--bg-soft)}
+.svc-head-left{display:flex;align-items:center;gap:16px}
+.svc-num{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--bg-blue);color:var(--accent);
+  font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.svc-item.is-open .svc-num{background:var(--accent);color:#fff}
+.svc-title{font-size:17px;font-weight:600;color:var(--text);letter-spacing:-0.01em}
+.svc-arrow{
+  width:28px;height:28px;border-radius:6px;border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s;color:var(--muted);font-size:16px;
+}
+.svc-item.is-open .svc-arrow{background:var(--accent);border-color:var(--accent);color:#fff;transform:rotate(45deg)}
+.svc-body{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.2,.7,.2,1)}
+.svc-item.is-open .svc-body{max-height:300px}
+.svc-body-inner{padding:4px 28px 28px 76px;font-size:15px;color:var(--muted);line-height:1.7;max-width:860px}
+
+/* ── SIMULATOR ── */
+.sim-story{
+  background:var(--bg-soft);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:48px;
+  margin-top:48px;
+  display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;
+}
+.sim-story-text p{font-size:17px;line-height:1.7;color:var(--muted);margin-bottom:16px}
+.sim-story-text p:last-child{margin-bottom:0}
+.sim-story-text strong{color:var(--text);font-weight:600}
+.sim-facts{display:flex;flex-direction:column;gap:0;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fff}
+.sim-fact{
+  padding:20px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:18px;
+}
+.sim-fact:last-child{border-bottom:none}
+.sim-fact-val{font-size:32px;font-weight:900;color:var(--accent);letter-spacing:-0.04em;min-width:80px;line-height:1}
+.sim-fact-label{font-size:13px;color:var(--muted);font-weight:500;line-height:1.4}
+
+.sim-divider{
+  text-align:center;padding:28px 0;
+  font-size:14px;font-weight:500;color:var(--muted);
+  display:flex;align-items:center;gap:16px;justify-content:center;
+  margin-top:32px;
+}
+.sim-divider::before,.sim-divider::after{content:'';flex:1;height:1px;background:var(--border);max-width:120px}
+
+/* ── CALCULATOR ── */
+.calc{
+  background:#fff;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  display:grid;grid-template-columns:380px 1fr;
+  margin-top:8px;
+  box-shadow:0 4px 40px rgba(0,0,0,0.06);
+}
+.calc-left{
+  background:var(--bg-soft);
+  border-right:1px solid var(--border);
+  padding:28px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.calc-left-head{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);
+  padding-bottom:14px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;
+}
+.calc-left-head span:last-child{color:var(--accent)}
+.inp-row{display:flex;flex-direction:column;gap:5px}
+.inp-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);display:flex;justify-content:space-between}
+.inp-label .u{color:#CBD5E1;font-weight:400}
+.inp-wrap{
+  display:flex;align-items:center;
+  background:#fff;
+  border:1.5px solid var(--border);
+  border-radius:8px;
+  transition:border-color .15s, box-shadow .15s;
+  overflow:hidden;
+}
+.inp-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.12)}
+.inp-wrap input{
+  flex:1;padding:11px 14px;
+  font-size:15px;font-weight:600;color:var(--text);
+  border:none;background:transparent;outline:none;
+}
+.inp-suf{
+  padding:0 12px;font-size:12px;font-weight:500;color:var(--muted);
+  background:var(--bg-soft);border-left:1px solid var(--border);
+  align-self:stretch;display:flex;align-items:center;
+}
+.inp-wrap select{
+  flex:1;padding:11px 14px;border:none;background:transparent;outline:none;
+  font-size:14px;font-weight:600;color:var(--text);
+  appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B7280' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+}
+
+.calc-right{display:flex;flex-direction:column}
+
+.verdict{
+  padding:28px;
+  border-bottom:1px solid var(--border);
+  transition:background .2s;
+  background:#fff;
+}
+.verdict.is-danger{background:#FEF2F2}
+.verdict.is-warn{background:#FFFBEB}
+.verdict.is-ok{background:#F0FDF4}
+.verdict-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 12px;border-radius:100px;
+  font-size:12px;font-weight:700;
+  margin-bottom:12px;
+  background:var(--bg-soft);color:var(--muted);
+}
+.verdict.is-danger .verdict-badge{background:#FEE2E2;color:var(--danger)}
+.verdict.is-warn .verdict-badge{background:#FEF3C7;color:var(--warn)}
+.verdict.is-ok .verdict-badge{background:#DCFCE7;color:var(--ok)}
+.verdict-badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.verdict h3{font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px;color:var(--text)}
+.verdict p{font-size:14px;color:var(--muted);line-height:1.6;max-width:700px}
+
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border)}
+.kpi{padding:20px 24px;border-right:1px solid var(--border);background:#fff}
+.kpi:last-child{border-right:none}
+.kpi-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:8px}
+.kpi-val{font-size:30px;font-weight:800;color:var(--text);letter-spacing:-0.03em;line-height:1}
+.kpi-val.bad{color:var(--danger)}
+.kpi-val.good{color:var(--ok)}
+.kpi-sub{font-size:11px;color:#9CA3AF;margin-top:5px}
+
+.breakdown{display:grid;grid-template-columns:1fr 1fr;flex:1}
+.bd-col{padding:20px 24px;border-right:1px solid var(--border);background:#fff}
+.bd-col:last-child{border-right:none}
+.bd-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text);padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.bd-head span{color:var(--muted);font-weight:400}
+.bd-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.bd-row:last-child{border-bottom:none;border-top:1.5px solid var(--text);margin-top:6px;padding-top:10px;font-weight:700}
+.bd-row .l{color:var(--muted);font-size:12px;font-weight:500}
+.bd-row .v{font-size:13px;font-weight:600;color:var(--text)}
+.bd-row.neg .v{color:var(--danger)}
+
+.calc-foot{
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 24px;
+  background:#fff;
+}
+.calc-foot-note{display:flex;align-items:center;gap:8px;font-size:12px;color:#9CA3AF;font-weight:500}
+.calc-foot-note .ld{width:7px;height:7px;border-radius:50%;background:#22C55E;animation:pulse 2s infinite}
+.calc-foot-btn{
+  background:var(--accent);color:#fff;
+  padding:12px 24px;border-radius:8px;
+  font-size:14px;font-weight:700;
+  display:flex;align-items:center;gap:8px;
+  transition:background .15s;
+}
+.calc-foot-btn:hover{background:var(--accent-hover)}
+
+/* ── STEPS ── */
+.steps{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;margin-top:48px;
+}
+.step-card{
+  background:#fff;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:32px;
+  position:relative;
+  transition:box-shadow .2s, border-color .2s;
+}
+.step-card:hover{border-color:#93C5FD;box-shadow:0 8px 32px rgba(37,99,235,0.1)}
+.step-num{
+  width:44px;height:44px;background:var(--accent);color:#fff;
+  border-radius:12px;font-size:20px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;letter-spacing:-0.02em;
+}
+.step-card h3{font-size:19px;font-weight:700;margin-bottom:6px;letter-spacing:-0.02em;color:var(--text)}
+.step-card .step-sub{font-size:12px;color:var(--accent);font-weight:600;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.05em}
+.step-card p{font-size:14px;color:var(--muted);line-height:1.65}
+
+.cta-band{
+  margin-top:48px;
+  background:var(--accent);
+  border-radius:var(--radius-lg);
+  padding:40px 48px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.cta-band-text h3{font-size:26px;font-weight:800;color:#fff;letter-spacing:-0.02em;margin-bottom:8px}
+.cta-band-text p{font-size:15px;color:rgba(255,255,255,0.75);font-weight:400}
+.cta-band-btn{
+  background:#fff;color:var(--accent);
+  padding:16px 32px;border-radius:10px;
+  font-size:15px;font-weight:700;white-space:nowrap;
+  transition:box-shadow .15s;
+  display:flex;align-items:center;gap:8px;
+}
+.cta-band-btn:hover{box-shadow:0 8px 24px rgba(0,0,0,0.15)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
+.overlay.open{display:flex;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{
+  background:#fff;border-radius:20px;
+  max-width:480px;width:100%;
+  box-shadow:0 24px 80px rgba(0,0,0,0.18);
+  animation:slideUp .3s cubic-bezier(.2,.7,.2,1);
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.modal-top{padding:28px 28px 0;display:flex;justify-content:space-between;align-items:flex-start}
+.modal-top h3{font-size:22px;font-weight:800;letter-spacing:-0.02em;color:var(--text);margin-bottom:6px}
+.modal-top p{font-size:14px;color:var(--muted);line-height:1.5}
+.modal-close-btn{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--bg-soft);color:var(--muted);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+  transition:background .15s;
+}
+.modal-close-btn:hover{background:var(--border)}
+.modal-body{padding:24px 28px 28px}
+.m-inp-row{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.m-inp-row:last-child{margin-bottom:0}
+.m-label{font-size:13px;font-weight:600;color:var(--text)}
+.m-inp-wrap{
+  background:var(--bg-soft);border:1.5px solid var(--border);
+  border-radius:8px;overflow:hidden;
+  transition:border-color .15s, box-shadow .15s;
+}
+.m-inp-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.12)}
+.m-inp-wrap input,.m-inp-wrap select{
+  width:100%;padding:12px 14px;border:none;background:transparent;outline:none;
+  font-size:15px;font-weight:500;color:var(--text);
+}
+.m-inp-wrap select{
+  appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B7280' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+}
+.m-submit{
+  width:100%;margin-top:20px;
+  background:var(--accent);color:#fff;
+  padding:16px;border-radius:10px;
+  font-size:16px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:background .15s;
+}
+.m-submit:hover{background:var(--accent-hover)}
+.m-note{margin-top:12px;text-align:center;font-size:12px;color:#9CA3AF}
+
+.m-success{padding:40px 28px;text-align:center;display:none}
+.m-success.on{display:block}
+.m-success-icon{
+  width:64px;height:64px;background:#DCFCE7;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-size:28px;
+}
+.m-success h3{font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em}
+.m-success p{font-size:14px;color:var(--muted);line-height:1.6}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);
+  margin-top:80px;background:var(--bg-soft);
+}
+.footer-inner{
+  max-width:1200px;margin:0 auto;padding:48px 40px 32px;
+  display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;
+}
+footer h5{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.06em}
+footer p{font-size:14px;color:var(--muted);line-height:1.6;max-width:340px}
+footer a{display:block;font-size:14px;color:var(--muted);padding:3px 0;transition:color .15s}
+footer a:hover{color:var(--accent)}
+.footer-bottom{max-width:1200px;margin:0 auto;padding:20px 40px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:13px;color:#9CA3AF}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .hero{padding:64px 20px 56px}
+  .container{padding:0 20px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stat:nth-child(2){border-right:none}
+  .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--border)}
+  .about-cards{grid-template-columns:1fr}
+  .sim-story{grid-template-columns:1fr;padding:28px;gap:28px}
+  .calc{grid-template-columns:1fr}
+  .calc-left{border-right:none;border-bottom:1px solid var(--border)}
+  .kpis{grid-template-columns:1fr}
+  .kpi{border-right:none;border-bottom:1px solid var(--border)}
+  .breakdown{grid-template-columns:1fr}
+  .bd-col{border-right:none;border-bottom:1px solid var(--border)}
+  .calc-foot{flex-direction:column;align-items:flex-start;gap:12px}
+  .steps{grid-template-columns:1fr}
+  .cta-band{flex-direction:column;align-items:flex-start;padding:28px}
+  .footer-inner{grid-template-columns:1fr;gap:32px}
+  .footer-bottom{flex-direction:column;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">CFO<span>Drive</span></div>
+    <div class="nav-links">
+      <a href="#about">Обо мне</a>
+      <a href="#services">Услуги</a>
+      <a href="#simulator">Симулятор</a>
+      <a href="#steps">Работа</a>
+    </div>
+    <button class="nav-btn" data-open-modal>Оставить заявку</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Работаю с производством, строительством и дистрибуцией
+  </div>
+  <h1>Операционный аудит и <span class="blue">кризис-аналитика</span> для производственных предприятий</h1>
+  <p class="hero-sub">Нахожу, где на вашем предприятии застревает кэш, откуда берутся кассовые разрывы и почему прибыль есть на бумаге — но не на счету.</p>
+  <div class="hero-actions">
+    <a href="#simulator" class="btn-primary">
+      Запустить стресс-тест
+      <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.8"/></svg>
+    </a>
+    <a href="#about" class="btn-secondary">Узнать подробнее</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats container">
+  <div class="stat">
+    <div class="stat-val">5</div>
+    <div class="stat-label">лет в аудите Big-4<br>(Deloitte)</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val">4</div>
+    <div class="stat-label">года CFO в реальном<br>производстве</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val">×8</div>
+    <div class="stat-label">ускорение сборки<br>управленческой отчётности</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val">0</div>
+    <div class="stat-label">дефицита сырья после<br>внедрения системы ТМЗ</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-label">Обо мне</div>
+    <h2 class="section-title">Опыт и компетенции</h2>
+    <p class="section-desc">9 лет на стыке международного аудита и операционного управления производственными компаниями Казахстана.</p>
+
+    <div class="about-cards">
+      <div class="about-card">
+        <div class="about-icon">🏦</div>
+        <div class="about-tag">5 лет · Deloitte</div>
+        <h3>Аудит (Deloitte)</h3>
+        <p>Проверка и оценка систем внутреннего контроля, финансовой отчётности и операционных рисков крупных предприятий по международным стандартам.</p>
+      </div>
+
+      <div class="about-card">
+        <div class="about-icon">🏭</div>
+        <div class="about-tag">4 года · CFO</div>
+        <h3>Финансовый директор в реальном секторе</h3>
+        <p>Управление финансовыми департаментами производственных, строительных и дистрибьюторских компаний Казахстана. Построение учёта непосредственно на производственных и складских объектах.</p>
+      </div>
+
+      <div class="about-card">
+        <div class="about-icon">🔍</div>
+        <div class="about-tag">Root Cause Analysis</div>
+        <h3>Кризис-аналитика</h3>
+        <p>Локализация причин финансовых и производственных сбоев. Декомпозиция факторов отклонения от бюджета, выявление скрытых потерь, подготовка аналитических прогнозов для руководства.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section" style="padding-top:0" id="services">
+  <div class="container">
+    <div class="section-label">Услуги</div>
+    <h2 class="section-title">Разработка и внедрение индивидуальных инженерно-финансовых систем</h2>
+    <p class="section-desc">Под масштаб и специфику конкретного бизнеса — без универсальных шаблонов.</p>
+
+    <div class="services">
+      <div class="svc-item">
+        <button class="svc-head" data-svc>
+          <div class="svc-head-left">
+            <div class="svc-num">01</div>
+            <span class="svc-title">Динамические финансовые модели</span>
+          </div>
+          <div class="svc-arrow">+</div>
+        </button>
+        <div class="svc-body"><div class="svc-body-inner">
+          Проектирование гибкой архитектуры таблиц без хардкода. Управление всей финансовой системой бизнеса через 10–12 ключевых операционных драйверов с автоматическим пересчётом сценариев, прибыли и Cash Flow.
+        </div></div>
+      </div>
+
+      <div class="svc-item">
+        <button class="svc-head" data-svc>
+          <div class="svc-head-left">
+            <div class="svc-num">02</div>
+            <span class="svc-title">Управление сквозными операционными циклами</span>
+          </div>
+          <div class="svc-arrow">+</div>
+        </button>
+        <div class="svc-body"><div class="svc-body-inner">
+          Синхронизация поставок, внутренних процессов и выбытия ресурсов. Настройка систем предиктивного контроля, которые учитывают временные задержки (плечо) и норму потребления. Ликвидация кассовых разрывов, дефицита снабжения и простоев на любом этапе цепочки.
+        </div></div>
+      </div>
+
+      <div class="svc-item">
+        <button class="svc-head" data-svc>
+          <div class="svc-head-left">
+            <div class="svc-num">03</div>
+            <span class="svc-title">Управление ликвидностью в кризисных условиях</span>
+          </div>
+          <div class="svc-arrow">+</div>
+        </button>
+        <div class="svc-body"><div class="svc-body-inner">
+          Ведение платёжного календаря и краткосрочного бюджетирования в периоды полной остановки операционной деятельности. Обеспечение контроля и выполнения критических обязательств при нулевом входящем потоке.
+        </div></div>
+      </div>
+
+      <div class="svc-item">
+        <button class="svc-head" data-svc>
+          <div class="svc-head-left">
+            <div class="svc-num">04</div>
+            <span class="svc-title">Операционный аудит и Cost Management</span>
+          </div>
+          <div class="svc-arrow">+</div>
+        </button>
+        <div class="svc-body"><div class="svc-body-inner">
+          Выявление скрытых потерь и неэффективных расходов через глубокий анализ данных «в полях» (пример: расчёт целесообразности и обоснование перехода с аренды активов на лизинг).
+        </div></div>
+      </div>
+
+      <div class="svc-item">
+        <button class="svc-head" data-svc>
+          <div class="svc-head-left">
+            <div class="svc-num">05</div>
+            <span class="svc-title">Оптимизация и автоматизация отчётности</span>
+          </div>
+          <div class="svc-arrow">+</div>
+        </button>
+        <div class="svc-body"><div class="svc-body-inner">
+          Реинжиниринг регламентов сбора данных. Сокращение времени подготовки внутренней операционной отчётности с полноценного рабочего дня до 1 часа за счёт внедрения унифицированных форм ввода.
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIMULATOR -->
+<section class="section" style="padding-top:0" id="simulator">
+  <div class="container">
+    <div class="section-label">Симулятор</div>
+    <h2 class="section-title">Интерактивный стресс-тест операционной модели</h2>
+
+    <div class="sim-story">
+      <div class="sim-story-text">
+        <p>Перед вами логика <strong>реальной финансовой модели</strong>, которую я внедрил для производственно-торговой компании в Казахстане. Бизнес рос, на бумаге была отличная прибыль — более 3,6 млн ₸ в месяц. Но на счетах постоянно не хватало денег на закупку сырья и налоги.</p>
+        <p>Модель оцифровала скрытую проблему: из-за длинного плеча поставок и отсрочек клиентам в оборотке мёртвым грузом застряло <strong>40 миллионов тенге</strong>. Любая попытка вырасти на 10% требовала ещё <strong>4 миллиона живых денег</strong>, которых у компании не было — создавая искусственный кассовый разрыв.</p>
+      </div>
+      <div class="sim-facts">
+        <div class="sim-fact">
+          <div class="sim-fact-val">3,6M</div>
+          <div class="sim-fact-label">Прибыль на бумаге ₸/мес</div>
+        </div>
+        <div class="sim-fact">
+          <div class="sim-fact-val">40M</div>
+          <div class="sim-fact-label">Заморожено в обороте, ₸</div>
+        </div>
+        <div class="sim-fact">
+          <div class="sim-fact-val">−4M</div>
+          <div class="sim-fact-label">Реальный разрыв при росте +10%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-divider">Подвигайте параметры ниже, чтобы спроецировать математику на свой бизнес</div>
+
+    <div class="calc">
+      <!-- INPUTS -->
+      <div class="calc-left">
+        <div class="calc-left-head">
+          <span>Входные параметры</span>
+          <span>7 драйверов</span>
+        </div>
+
+        <div class="inp-row">
+          <label class="inp-label" for="i-rev">Выручка в месяц <span class="u">₸/мес</span></label>
+          <div class="inp-wrap"><input id="i-rev" type="number" value="20000000" min="0" step="1000000"><span class="inp-suf">₸</span></div>
+        </div>
+        <div class="inp-row">
+          <label class="inp-label" for="i-mu">Наценка на товар <span class="u">%</span></label>
+          <div class="inp-wrap"><input id="i-mu" type="number" value="50" min="0" step="5"><span class="inp-suf">%</span></div>
+        </div>
+        <div class="inp-row">
+          <label class="inp-label" for="i-log">Логистическое плечо <span class="u">дней</span></label>
+          <div class="inp-wrap"><input id="i-log" type="number" value="30" min="0" step="1"><span class="inp-suf">дн.</span></div>
+        </div>
+        <div class="inp-row">
+          <label class="inp-label" for="i-stk">Оборачиваемость склада <span class="u">дней</span></label>
+          <div class="inp-wrap"><input id="i-stk" type="number" value="45" min="0" step="1"><span class="inp-suf">дн.</span></div>
+        </div>
+        <div class="inp-row">
+          <label class="inp-label" for="i-dbt">Отсрочка клиентам <span class="u">дней</span></label>
+          <div class="inp-wrap"><input id="i-dbt" type="number" value="10" min="0" step="1"><span class="inp-suf">дн.</span></div>
+        </div>
+        <div class="inp-row">
+          <label class="inp-label" for="i-fx">Постоянные расходы <span class="u">₸/мес</span></label>
+          <div class="inp-wrap"><input id="i-fx" type="number" value="3000000" min="0" step="100000"><span class="inp-suf">₸</span></div>
+        </div>
+        <div class="inp-row">
+          <label class="inp-label" for="i-gr">Темп роста выручки <span class="u">м/м</span></label>
+          <div class="inp-wrap"><input id="i-gr" type="number" value="10" min="0" step="1"><span class="inp-suf">%</span></div>
+        </div>
+      </div>
+
+      <!-- OUTPUT -->
+      <div class="calc-right">
+        <div class="verdict" id="verdict">
+          <div class="verdict-badge"><span class="dot"></span><span id="vtag">Диагноз</span></div>
+          <h3 id="vtitle">Считаю...</h3>
+          <p id="vbody">Меняйте параметры — расчёт обновляется мгновенно.</p>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi">
+            <div class="kpi-label">CCC — цикл денег</div>
+            <div class="kpi-val" id="k-ccc">85</div>
+            <div class="kpi-sub">дней от закупки до оплаты</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Заморожено в обороте</div>
+            <div class="kpi-val" id="k-frz">40,0M</div>
+            <div class="kpi-sub" id="k-frz-s">≈ 2,0 мес. выручки</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Реальный Cash Flow</div>
+            <div class="kpi-val" id="k-cf">−333K</div>
+            <div class="kpi-sub" id="k-cf-s">при росте +10%/мес</div>
+          </div>
+        </div>
+
+        <div class="breakdown">
+          <div class="bd-col">
+            <div class="bd-head">P&amp;L — прибыль на бумаге <span>Блок 2</span></div>
+            <div class="bd-row"><span class="l">Выручка</span><span class="v" id="b-rev">—</span></div>
+            <div class="bd-row neg"><span class="l">Себестоимость COGS</span><span class="v" id="b-cogs">—</span></div>
+            <div class="bd-row"><span class="l">Валовая прибыль</span><span class="v" id="b-grs">—</span></div>
+            <div class="bd-row neg"><span class="l">Пост. расходы</span><span class="v" id="b-fix">—</span></div>
+            <div class="bd-row"><span class="l">Чистая прибыль</span><span class="v" id="b-net">—</span></div>
+          </div>
+          <div class="bd-col">
+            <div class="bd-head">Замороженные деньги <span>Блок 4</span></div>
+            <div class="bd-row"><span class="l">Товар в пути</span><span class="v" id="b-tr">—</span></div>
+            <div class="bd-row"><span class="l">ТМЗ на складе</span><span class="v" id="b-wh">—</span></div>
+            <div class="bd-row"><span class="l">Дебиторка</span><span class="v" id="b-rc">—</span></div>
+            <div class="bd-row neg"><span class="l">Прирост ТМЗ/мес</span><span class="v" id="b-gr">—</span></div>
+            <div class="bd-row"><span class="l">Разрыв прибыль/кэш</span><span class="v" id="b-gp">—</span></div>
+          </div>
+        </div>
+
+        <div class="calc-foot">
+          <div class="calc-foot-note">
+            <span class="ld"></span>
+            Расчёт обновлён · CCC + P&amp;L + Cash Flow
+          </div>
+          <button class="calc-foot-btn" data-open-modal>
+            Забронировать 15-минутный разбор в WhatsApp
+            <svg width="13" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.8"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="section" style="padding-top:0" id="steps">
+  <div class="container">
+    <div class="section-label">Как строится работа</div>
+    <h2 class="section-title">Что делать с этими цифрами дальше?</h2>
+    <p class="section-desc">Калькулятор наглядно показывает: можно иметь отличную прибыль на бумаге, но сидеть без денег из-за длинной логистики или раздутого склада. Рост продаж в такой ситуации только увеличивает разрыв.</p>
+
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <h3>Первичный разбор</h3>
+        <div class="step-sub">Созвон · 15 минут</div>
+        <p>Созваниваемся в WhatsApp. Вы показываете свои цифры, я нахожу точные точки, где застревает кэш и сколько времени тратится на отчёты.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <h3>Проектирование модели</h3>
+        <div class="step-sub">от 10 рабочих дней</div>
+        <p>Беру ваши реальные техкарты, контракты, выписки и собираю рабочую систему: динамическую финмодель, контроль ТМЗ и платёжный календарь. Без шаблонов — всё с нуля под ваши процессы.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <h3>Результат</h3>
+        <div class="step-sub">1 час вместо дня</div>
+        <p>Время сборки отчётности сокращается с целого дня до 1 часа. Закупки привязываются к норме расхода. Вы знаете, сколько прибыли можете вытащить без риска остановить производство.</p>
+      </div>
+    </div>
+
+    <div class="cta-band">
+      <div class="cta-band-text">
+        <h3>Готовы начать с первичного разбора?</h3>
+        <p>Оставьте контакты — свяжусь лично для предварительного разбора ситуации.</p>
+      </div>
+      <button class="cta-band-btn" data-open-modal>
+        Оставить заявку
+        <svg width="13" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.8"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <div id="mform">
+      <div class="modal-top">
+        <div>
+          <h3>Оставить заявку</h3>
+          <p>Заполните контактные данные — свяжусь лично для предварительного разбора ситуации.</p>
+        </div>
+        <button class="modal-close-btn" data-close-modal>✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="m-inp-row">
+          <label class="m-label" for="m-name">Имя</label>
+          <div class="m-inp-wrap"><input id="m-name" type="text" placeholder="Как к вам обращаться"></div>
+        </div>
+        <div class="m-inp-row">
+          <label class="m-label" for="m-wa">WhatsApp / телефон</label>
+          <div class="m-inp-wrap"><input id="m-wa" type="tel" placeholder="+7 ___ ___ __ __" value="+7"></div>
+        </div>
+        <div class="m-inp-row">
+          <label class="m-label" for="m-sc">Оборот компании в месяц</label>
+          <div class="m-inp-wrap">
+            <select id="m-sc">
+              <option>До 5 млн ₸</option>
+              <option selected>5–15 млн ₸</option>
+              <option>15–50 млн ₸</option>
+              <option>Более 50 млн ₸</option>
+            </select>
+          </div>
+        </div>
+        <button class="m-submit" id="m-submit">
+          Отправить заявку
+          <svg width="13" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5h12m0 0L9 1m4 4L9 9" stroke="currentColor" stroke-width="1.8"/></svg>
+        </button>
+        <div class="m-note">Параметры стресс-теста автоматически прикрепляются к сообщению</div>
+      </div>
+    </div>
+    <div class="m-success" id="msuccess">
+      <div class="m-success-icon">✓</div>
+      <h3>Заявка отправлена</h3>
+      <p>Открыл WhatsApp с готовым сообщением. Свяжусь с вами в течение часа.</p>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+const $ = id => document.getElementById(id);
+
+// ACCORDION
+document.querySelectorAll('[data-svc]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.svc-item');
+    const open = item.classList.contains('is-open');
+    document.querySelectorAll('.svc-item').forEach(el => el.classList.remove('is-open'));
+    if (!open) item.classList.add('is-open');
+  });
+});
+
+// CALCULATOR
+function fmt(n){ return new Intl.NumberFormat('ru-RU').format(Math.round(n)) + ' ₸' }
+function fmtC(n){
+  const abs = Math.abs(n), s = n < 0 ? '−' : '';
+  if(abs>=1e9) return s+(abs/1e9).toFixed(1).replace('.',',')+'B';
+  if(abs>=1e6) return s+(abs/1e6).toFixed(1).replace('.',',')+'M';
+  if(abs>=1e3) return s+Math.round(abs/1e3)+'K';
+  return s+Math.round(abs);
+}
+
+function calc(){
+  const C4  = +$('i-rev').value||0;
+  const C5  = (+$('i-mu').value||0)/100;
+  const C6  = +$('i-log').value||0;
+  const C7  = +$('i-stk').value||0;
+  const C8  = +$('i-dbt').value||0;
+  const C9  = +$('i-fx').value||0;
+  const C35 = (+$('i-gr').value||0)/100;
+
+  const C12=C4, C13=C12/(1+C5), C14=C12-C13, C16=C14-C9;
+  const C23=C6+C7+C8;
+  const C27=C13/30, C28=C27*C6, C29=C27*C7, C30=(C4/30)*C8;
+  const C31=C28+C29+C30, C32=C4?C31/C4:0;
+  const C36=C16, C37=-C31*C35, C38=C36+C37, C39=C38-C36;
+
+  let st,ti,bo;
+  if(C38<0){st='danger';ti='Риск кассового разрыва';bo='Бумажная прибыль '+fmt(C36)+', но реальный Cash Flow отрицательный: '+fmt(C38)+' в месяц. Рост съедает деньги быстрее, чем приносит. При сохранении темпов через 2–3 месяца предприятие останется без оборотки.'}
+  else if(C38<C36*.5){st='warn';ti='Кэш сильно отстаёт от прибыли';bo='Прибыль '+fmt(C36)+', но реальный кэш только '+fmt(C38)+'. Более половины зарабатываемого замораживается в ТМЗ и дебиторке. Запас прочности — на грани.'}
+  else{st='ok';ti='Операционная модель устойчива';bo='Реальный Cash Flow '+fmt(C38)+' соответствует бумажной прибыли. Цикл денег '+Math.round(C23)+' дней — в рабочем диапазоне.'}
+
+  const v=$('verdict');
+  v.className='verdict is-'+st;
+  $('vtag').textContent = st==='danger'?'Критический риск':st==='warn'?'Зона внимания':'Норма';
+  $('vtitle').textContent=ti; $('vbody').textContent=bo;
+
+  $('k-ccc').textContent=Math.round(C23);
+  $('k-frz').textContent=fmtC(C31);
+  $('k-frz-s').textContent='≈ '+C32.toFixed(1).replace('.',',')+' мес. выручки';
+  const kc=$('k-cf');
+  kc.textContent=fmtC(C38);
+  kc.className='kpi-val'+(C38<0?' bad':C38>=C36*.5?' good':'');
+  $('k-cf-s').textContent='при росте +'+Math.round(C35*100)+'%/мес';
+
+  $('b-rev').textContent=fmt(C12);
+  $('b-cogs').textContent='−'+fmt(C13);
+  $('b-grs').textContent=fmt(C14);
+  $('b-fix').textContent='−'+fmt(C9);
+  $('b-net').textContent=fmt(C16);
+  $('b-tr').textContent=fmt(C28);
+  $('b-wh').textContent=fmt(C29);
+  $('b-rc').textContent=fmt(C30);
+  $('b-gr').textContent=(C37<=0?'−':'+')+fmt(Math.abs(C37));
+  $('b-gp').textContent=(C39<=0?'−':'+')+fmt(Math.abs(C39));
+
+  window._d={revenue:C4,markup:C5*100,logistics:C6,stock:C7,debt:C8,fixed:C9,growth:C35*100,
+    CCC:C23,frozen:C31,frozenM:C32,netProfit:C16,cashFlow:C38,gap:C39,st,ti,bo};
+}
+['i-rev','i-mu','i-log','i-stk','i-dbt','i-fx','i-gr'].forEach(id=>$(id).addEventListener('input',calc));
+calc();
+
+// MODAL
+function fmt2(n){ return new Intl.NumberFormat('ru-RU').format(Math.round(n))+' ₸' }
+function open(){$('modal').classList.add('open');$('mform').style.display='';$('msuccess').classList.remove('on');document.body.style.overflow='hidden'}
+function close(){$('modal').classList.remove('open');document.body.style.overflow=''}
+document.querySelectorAll('[data-open-modal]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();open()}));
+document.querySelectorAll('[data-close-modal]').forEach(b=>b.addEventListener('click',close));
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal')close()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+
+$('m-submit').addEventListener('click',()=>{
+  const d=window._d;
+  const name=$('m-name').value.trim();
+  const wa=$('m-wa').value.trim();
+  const sc=$('m-sc').value;
+  if(!name||!wa){alert('Заполни имя и номер');return}
+  
+  const msg=`📋 ЗАЯВКА\n\n👤 ${name}  📱 ${wa}\n💰 ${sc}\n\n• CCC: ${Math.round(d.CCC)} дн • Заморожено: ${fmt2(d.frozen)} • Cash Flow: ${fmt2(d.cashFlow)}\n\n${d.ti}`;
+  
+  const form_id='1FAIpQLSfuwhS1lwvq0Tq9rf5KOz82Rn6TKSd_OjFrqTmYEFEJmlQW6g';
+  const entry_name='entry.1045781291';
+  const entry_wa='entry.1166974658';
+  const entry_sc='entry.1065488983';
+  
+  const formData=new FormData();
+  formData.append(entry_name,name);
+  formData.append(entry_wa,wa);
+  formData.append(entry_sc,sc);
+  
+  fetch(`https://docs.google.com/forms/u/0/d/e/${form_id}/formResponse`,{method:'POST',body:formData,mode:'no-cors'})
+  .then(()=>{
+    window.open('https://wa.me/77786300784?text='+encodeURIComponent(msg),'_blank');
+    $('mform').style.display='none';
+    $('msuccess').classList.add('on');
+  })
+  .catch(e=>console.log('sent'));
+});
+
+// smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const el=document.getElementById(a.getAttribute('href').slice(1));
+    if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'})}
+  });
+});
+</script>
+</body>
+</html>
