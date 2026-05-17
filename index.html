@@ -955,11 +955,30 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
 
 $('m-submit').addEventListener('click',()=>{
   const d=window._d;
-  const txt=`📋 ЗАЯВКА НА ОПЕРАЦИОННЫЙ АУДИТ\n\n👤 ${$('m-name').value||'—'}  ·  📱 ${$('m-wa').value||'—'}\n💰 Оборот: ${$('m-sc').value}\n\n━━━ ПАРАМЕТРЫ СИМУЛЯТОРА ━━━\n• Выручка/мес: ${fmt2(d.revenue)}\n• Наценка: ${d.markup}%\n• Лог. плечо: ${d.logistics} дн.\n• Склад: ${d.stock} дн.\n• Отсрочка: ${d.debt} дн.\n• Пост. расходы: ${fmt2(d.fixed)}\n• Рост: ${d.growth}%/мес\n\n━━━ РЕЗУЛЬТАТ ━━━\n• CCC: ${Math.round(d.CCC)} дн.\n• Заморожено: ${fmt2(d.frozen)} (≈${d.frozenM.toFixed(1).replace('.',',')} мес. выручки)\n• Чистая прибыль: ${fmt2(d.netProfit)}\n• Реальный Cash Flow: ${fmt2(d.cashFlow)}\n• Разрыв: ${fmt2(d.gap)}\n\n📌 ${d.ti}\n${d.bo}`;
-  // ← ЗАМЕНИТЬ на свой номер WhatsApp
-  window.open('https://wa.me/77786300784?text='+encodeURIComponent(txt),'_blank');
-  $('mform').style.display='none';
-  $('msuccess').classList.add('on');
+  const name=$('m-name').value.trim();
+  const wa=$('m-wa').value.trim();
+  const sc=$('m-sc').value;
+  if(!name||!wa){alert('Заполни имя и номер');return}
+  
+  const msg=`📋 ЗАЯВКА\n\n👤 ${name}  📱 ${wa}\n💰 ${sc}\n\n• CCC: ${Math.round(d.CCC)} дн • Заморожено: ${fmt2(d.frozen)} • Cash Flow: ${fmt2(d.cashFlow)}\n\n${d.ti}`;
+  
+  const form_id='1FAIpQLSfuwhS1lwvq0Tq9rf5KOz82Rn6TKSd_OjFrqTmYEFEJmlQW6g';
+  const entry_name='entry.1045781291';
+  const entry_wa='entry.1166974658';
+  const entry_sc='entry.1065488983';
+  
+  const formData=new FormData();
+  formData.append(entry_name,name);
+  formData.append(entry_wa,wa);
+  formData.append(entry_sc,sc);
+  
+  fetch(`https://docs.google.com/forms/u/0/d/e/${form_id}/formResponse`,{method:'POST',body:formData,mode:'no-cors'})
+  .then(()=>{
+    window.open('https://wa.me/77786300784?text='+encodeURIComponent(msg),'_blank');
+    $('mform').style.display='none';
+    $('msuccess').classList.add('on');
+  })
+  .catch(e=>console.log('sent'));
 });
 
 // smooth scroll
